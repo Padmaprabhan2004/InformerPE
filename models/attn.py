@@ -77,7 +77,12 @@ class ProbAttention(nn.Module):
             assert(L_Q == L_V) # requires that L_Q == L_V, i.e. for self-attention only
             contex = V.cumsum(dim=-2)
         return contex
-
+    def get_del_V(self,V,L_Q):
+        B,H,L_Q,D=V.shape
+        delV=V.clone()
+        delV[:,:,1:,:]=V[:,:,1:,:]-V[:,:,:-1,:]
+        delV[:,:,0,:]=V[:,:,0,:]
+        return delV
     def _update_context(self, context_in, V, scores, index, L_Q, attn_mask):
         B, H, L_V, D = V.shape
 
@@ -119,8 +124,9 @@ class ProbAttention(nn.Module):
             scores_top = scores_top * scale
         # get the context
         context = self._get_initial_context(values, L_Q)
+        delV= self.get_del_V(values,L_Q)
         # update the context with selected top_k queries
-        context, attn = self._update_context(context, values, scores_top, index, L_Q, attn_mask)
+        context, attn = self._update_context(context, delV, scores_top, index, L_Q, attn_mask)
         
         return context.transpose(2,1).contiguous(), attn
 
