@@ -12,6 +12,7 @@ class DecoderLayer(nn.Module):
         self.conv1 = nn.Conv1d(in_channels=d_model, out_channels=d_ff, kernel_size=1)
         self.conv11=  nn.Conv1d(in_channels=d_ff, out_channels=d_ff, kernel_size=1)
         self.conv12=  nn.Conv1d(in_channels=d_ff, out_channels=d_ff, kernel_size=1)
+        self.conv13= nn.Conv1d(in_channels=d_ff, out_channels=d_ff, kernel_size=1)
         self.conv2 = nn.Conv1d(in_channels=d_ff, out_channels=d_model, kernel_size=1)
         self.norm1 = nn.LayerNorm(d_model)
         self.norm2 = nn.LayerNorm(d_model)
@@ -35,6 +36,7 @@ class DecoderLayer(nn.Module):
         y = self.dropout(self.activation(self.conv1(y.transpose(-1,1))))
         y = self.dropout(self.activation(self.conv11(y)))
         y = self.dropout(self.activation(self.conv12(y)))
+        y = self.dropout(self.activation(self.conv13(y)))
         y = self.dropout(self.conv2(y).transpose(-1,1))
 
         return self.norm3(x+y)
