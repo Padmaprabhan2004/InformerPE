@@ -7,7 +7,7 @@ import numpy as np
 from scipy.special import eval_legendre
 
 class PoPEEmbedding(nn.Module):
-    def __init__(self, d_model, max_len=5000):
+    def __init__(self, d_model, max_len=200):
         super(PoPEEmbedding, self).__init__()
         pe = torch.zeros(max_len, d_model).float()
 
