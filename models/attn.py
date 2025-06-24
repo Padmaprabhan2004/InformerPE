@@ -136,7 +136,7 @@ class ProbAttention(nn.Module):
         context = self._get_initial_context(values, L_Q)
         delV=self.get_del_V(values,L_Q)
         # update the context with selected top_k queries
-        context, attn = self._update_context(context, delV, scores_top, index, L_Q, attn_mask,2.0)
+        context, attn = self._update_context(context, delV, scores_top, index, L_Q, attn_mask,1.0)
         
         return context.transpose(2,1).contiguous(), attn
 
