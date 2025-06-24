@@ -78,7 +78,7 @@ class ProbAttention(nn.Module):
             contex = V.cumsum(dim=-2)
         return contex
 
-    def _update_context(self, context_in, V, scores, index, L_Q, attn_mask):
+    def _update_context(self, context_in, V, scores, index, L_Q, attn_mask,decay_power):
         B, H, L_V, D = V.shape
 
         if self.mask_flag:
@@ -86,6 +86,15 @@ class ProbAttention(nn.Module):
             scores.masked_fill_(attn_mask.mask, -np.inf)
 
         attn = torch.softmax(scores, dim=-1) # nn.Softmax(dim=-1)(scores)
+        ##---------decay metric-----------------###
+        pos_i = torch.arange(L_Q, device=V.device).view(1, 1, L_Q, 1)
+        pos_j = torch.arange(L_V, device=V.device).view(1, 1, 1, L_V)
+        distance = torch.abs(pos_i - pos_j).float() + 1e-5  
+        
+        decay = 1.0 / (distance ** decay_power)  
+        attn = attn * decay[:, :, index, :].to(attn.device)
+        attn = attn / attn.sum(dim=-1, keepdim=True)
+        # --------------------------
 
         context_in[torch.arange(B)[:, None, None],
                    torch.arange(H)[None, :, None],
@@ -127,7 +136,7 @@ class ProbAttention(nn.Module):
         context = self._get_initial_context(values, L_Q)
         delV=self.get_del_V(values,L_Q)
         # update the context with selected top_k queries
-        context, attn = self._update_context(context, delV, scores_top, index, L_Q, attn_mask)
+        context, attn = self._update_context(context, delV, scores_top, index, L_Q, attn_mask,2.0)
         
         return context.transpose(2,1).contiguous(), attn
 
