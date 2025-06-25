@@ -20,7 +20,7 @@ class DecoderLayer(nn.Module):
     def forward(self, x, cross, x_mask=None, cross_mask=None):
         x = x + self.dropout(self.self_attention(
             x, x, x,
-            attn_mask=x_mask,
+            x_mask,
             p,
             p
         )[0])
@@ -28,7 +28,7 @@ class DecoderLayer(nn.Module):
 
         x = x + self.dropout(self.cross_attention(
             x, cross, cross,
-            attn_mask=cross_mask,
+            cross_mask,
             p,
             p
         )[0])
