@@ -48,6 +48,7 @@ class EncoderLayer(nn.Module):
         super(EncoderLayer, self).__init__()
         d_ff = d_ff or 4*d_model
         self.attention = attention
+        self.d_model=d_model
         self.conv1 = nn.Conv1d(in_channels=d_model, out_channels=d_ff, kernel_size=1)
         self.conv2 = nn.Conv1d(in_channels=d_ff, out_channels=d_model, kernel_size=1)
         self.norm1 = nn.LayerNorm(d_model)
@@ -61,7 +62,7 @@ class EncoderLayer(nn.Module):
         #     x, x, x,
         #     attn_mask = attn_mask
         # ))
-        p=PositionalEmbedding(d_model)
+        p=PositionalEmbedding(self.d_model)
         new_x, attn = self.attention(
             x, x, x,
             attn_mask,
