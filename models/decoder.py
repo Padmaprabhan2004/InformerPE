@@ -39,7 +39,7 @@ class DecoderLayer(nn.Module):
         self.activation = F.relu if activation == "relu" else F.gelu
 
     def forward(self, x, cross, x_mask=None, cross_mask=None):
-        p=PositionalEmbedding(self.d_model)
+        p=PositionalEmbedding(self.d_model)(x)
         x = x + self.dropout(self.self_attention(
             x, x, x,
             x_mask,
