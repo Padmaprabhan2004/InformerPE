@@ -41,7 +41,8 @@ class FullAttention(nn.Module):
         B, L, H, E = Q_x.shape
         _, S, _, _ = V.shape
         scale = self.scale or 1. / sqrt(E)
-    
+        print(Q_x.shape, K_p.shape, Q_p.shape, K_x.shape)
+
         # Cross attention terms only
         scores = torch.einsum("blhe,bshe->bhls", Q_x, K_p) + \
                  torch.einsum("blhe,bshe->bhls", Q_p, K_x)
