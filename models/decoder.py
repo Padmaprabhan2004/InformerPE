@@ -40,6 +40,7 @@ class DecoderLayer(nn.Module):
 
     def forward(self, x, cross, x_mask=None, cross_mask=None):
         p=PositionalEmbedding(self.d_model)(x)
+        p=p.expand(x.shape[0],-1,-1)
         x = x + self.dropout(self.self_attention(
             x, x, x,
             x_mask,
