@@ -170,7 +170,9 @@ class AttentionLayer(nn.Module):
         B, L, _ = queries.shape
         _, S, _ = keys.shape
         H = self.n_heads
-    
+        device = queries.device
+        pos_queries = pos_queries.to(device)
+        pos_keys = pos_keys.to(device)
         Q_x = self.query_projection(queries).view(B, L, H, -1)
         K_x = self.key_projection(keys).view(B, S, H, -1)
         V = self.value_projection(values).view(B, S, H, -1)
