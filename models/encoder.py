@@ -63,6 +63,7 @@ class EncoderLayer(nn.Module):
         #     attn_mask = attn_mask
         # ))
         p=PositionalEmbedding(self.d_model)(x)
+        print(p.shape)
         new_x, attn = self.attention(
             x, x, x,
             attn_mask,
