@@ -39,8 +39,14 @@ class DecoderLayer(nn.Module):
         self.activation = F.relu if activation == "relu" else F.gelu
 
     def forward(self, x, cross, x_mask=None, cross_mask=None):
-        p=PositionalEmbedding(self.d_model)(x)
-        p=p.expand(x.shape[0],-1,-1)
+        p = PositionalEmbedding(self.d_model)(x)
+        p = p.expand(x.shape[0], -1, -1)
+        
+        # Use correct PE for both streams:
+        p_x = p
+        p_c = PositionalEmbedding(self.d_model)(cross)
+        p_c = p_c.expand(cross.shape[0], -1, -1)
+
         x = x + self.dropout(self.self_attention(
             x, x, x,
             x_mask,
@@ -48,12 +54,12 @@ class DecoderLayer(nn.Module):
             p
         )[0])
         x = self.norm1(x)
-
+        
         x = x + self.dropout(self.cross_attention(
             x, cross, cross,
             cross_mask,
-            p,
-            p
+            p_x,
+            p_c
         )[0])
 
         y = x = self.norm2(x)
